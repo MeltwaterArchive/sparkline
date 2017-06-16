@@ -10,7 +10,25 @@ defmodule Sparkline.Mixfile do
      deps: deps()]
   end
 
+  defp description do
+    """
+    Sparkline lets you create small inline ANSI charts of time series. It supports
+    two modes: sparkline and chart. The former fits in one line, the latter spans
+    multiple lines and has labels.
+    """
+  end
+
   defp deps do
     [{:timex, "~> 3.1"}]
+  end
+
+  defp package do
+    [
+      name: :sparkline,
+      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      maintainers: ["Meltwater Group"],
+      licences: ["MIT"],
+      links: %{"GitHub" => "https://github.com/meltwater/sparkline"}
+    ]
   end
 end
