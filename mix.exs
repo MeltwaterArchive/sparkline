@@ -9,6 +9,7 @@ defmodule Sparkline.Mixfile do
      start_permanent: Mix.env == :prod,
      description: description(),
      package: package(),
+     licences: package().licences,
      deps: deps()]
   end
 
@@ -27,7 +28,7 @@ defmodule Sparkline.Mixfile do
   defp package do
     [
       name: :sparkline,
-      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      files: ["lib", "mix.exs", "README*", "LICENSE*"],
       maintainers: ["Meltwater Group"],
       licences: ["MIT"],
       links: %{"GitHub" => "https://github.com/meltwater/sparkline"}
