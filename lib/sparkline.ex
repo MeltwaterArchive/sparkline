@@ -5,14 +5,34 @@ defmodule Sparkline do
   multiple lines and has labels.
   """
 
-  @doc """
-  Hello world.
+  @doc ~S"""
+  Get an inline sparkline.
 
   ## Examples
 
-      iex> Sparkline.sparkline [1,2,3,4,5,7,8,9]
+      iex> Sparkline.sparkline [1,2,3,4,5,6,7,8]
       "▁▂▃▄▅▆▇█"
 
+      iex> Sparkline.sparkline [100, 200, 300]
+      "▁▅█"
+
+      iex> Sparkline.sparkline [-100, 0, 100]
+      "▁▅█"
+
+      iex> Sparkline.sparkline [-100, 0, 100], spark_bars: [".",":","|"]
+      ".:|"
+
+      iex> [
+      ...>   %{data: 1},
+      ...>   %{data: 2},
+      ...>   %{data: 3},
+      ...>   %{data: 4},
+      ...>   %{data: 5},
+      ...>   %{data: 6},
+      ...>   %{data: 7},
+      ...>   %{data: 8}
+      ...> ] |> Enum.map(&(&1[:data])) |> Sparkline.sparkline
+      "▁▂▃▄▅▆▇█"
   """
   def sparkline(data, options \\ []) do
     opts   = Keyword.merge(default_chart_options(), options)
@@ -20,7 +40,7 @@ defmodule Sparkline do
     bars   = opts[:spark_bars]
 
     {min, max} = Enum.min_max values
-    step  = (max - min) / (length(bars))
+    step  = (max - min) / (length(bars) - 1)
     steps = seq min, max - step, step
 
     bars_with_index = [steps, bars] |> Enum.zip
@@ -35,6 +55,9 @@ defmodule Sparkline do
     |> Enum.join
   end
 
+  @doc ~S"""
+  Get an ASCII chart for a time series.
+  """
   def chart(data, options \\ []) do
     opts = Keyword.merge(default_chart_options(), options)
     x_labels = opts[:x_labels].(data) |> Enum.map(&(ensure_length(&1, opts[:bar_width] * 2)))
@@ -62,6 +85,29 @@ defmodule Sparkline do
 
     lines ++ [x_axis, x_labels_odd, x_labels_even]
     |> Enum.join("\n")
+  end
+
+  @doc ~S"""
+  Convert a string ISO timestamp to a short label.
+  """
+  def get_time_label(iso_timestamp_string, granularity \\ :day) do
+    timestamp = Timex.parse! iso_timestamp_string, "{ISO:Extended}"
+    case granularity do
+      :year ->
+        Timex.format! timestamp, "%y", :strftime
+      :month ->
+        Timex.format! timestamp, "%m", :strftime
+      :day ->
+        timestamp |> Timex.weekday |> Timex.day_shortname |> String.slice(0, 2)
+      :hour ->
+        Timex.format! timestamp, "%H", :strftime
+      :minute ->
+        Timex.format! timestamp, "%M", :strftime
+      :second ->
+        Timex.format! timestamp, "%S", :strftime
+      _ ->
+        ""
+    end
   end
 
   defp default_chart_options() do
@@ -140,26 +186,6 @@ defmodule Sparkline do
         else
           [start] ++ seq(start+step, stop, step)
         end
-    end
-  end
-
-  def get_time_label(iso_timestamp_string, granularity \\ :day) do
-    timestamp = Timex.parse! iso_timestamp_string, "{ISO:Extended}"
-    case granularity do
-      :year ->
-        Timex.format! timestamp, "%y", :strftime
-      :month ->
-        Timex.format! timestamp, "%m", :strftime
-      :day ->
-        timestamp |> Timex.weekday |> Timex.day_shortname |> String.slice(0, 2)
-      :hour ->
-        Timex.format! timestamp, "%H", :strftime
-      :minute ->
-        Timex.format! timestamp, "%M", :strftime
-      :second ->
-        Timex.format! timestamp, "%S", :strftime
-      _ ->
-        ""
     end
   end
 

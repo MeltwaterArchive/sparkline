@@ -1,6 +1,8 @@
 # Sparkline
 
-**TODO: Add description**
+Sparkline lets you create small inline ANSI charts of time series. It supports
+two modes: sparkline and chart. The former fits in one line, the latter spans
+multiple lines and has labels.
 
 ## Installation
 
